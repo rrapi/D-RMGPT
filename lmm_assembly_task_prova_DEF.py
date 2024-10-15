@@ -12,7 +12,15 @@ import base64
 from camera import RealSenseCamera
 import time
 import cv2
-import winsound
+try:
+    import winsound
+except ImportError:
+    def playsound(freq, duration):
+        os.system('play -n synth %s sin %s' % (duration/1000, freq))
+        # os.system('play -nq -t alsa synth {} sine {}'.format(duration/1000, freq))
+else:
+    def playsound(freq, duration):
+        winsound.Beep(freq, duration)
 import numpy as np
 
 # Set your OpenAI API key
@@ -97,7 +105,7 @@ while True:
     text_query = read_text_file("data/response_assistant.txt")
     image1=camera1.get_image_bundle()
     rgb1 = image1['rgb']
-    winsound.Beep(1000, 300)
+    playsound(1000, 300)
     rgb1 = cv2.cvtColor(rgb1, cv2.COLOR_BGR2RGB)
     cv2.imwrite(os.path.join(file_path, file_name1), rgb1)
     # Getting the base64 string
@@ -105,7 +113,7 @@ while True:
     
     image2=camera2.get_image_bundle()
     rgb2 = image2['rgb']
-    winsound.Beep(1000, 300)
+    playsound(1000, 300)
     rgb2 = cv2.cvtColor(rgb2, cv2.COLOR_BGR2RGB)
     cv2.imwrite(os.path.join(file_path, file_name2), rgb2)
     # Getting the base64 string
@@ -241,7 +249,7 @@ while True:
         s.close()
         break
     
-    winsound.Beep(5000, 200)
+    playsound(5000, 200)
     input()
 t_end=time.time()
 
