@@ -31,7 +31,7 @@ os.environ["OPENAI_API_KEY"] = constants.APIKEY
 cwd 		= os.getcwd()
 dataset_path	= os.path.join(cwd, 'data', 'Assembly_sequence_images')
 dir_list 	= os.listdir(dataset_path)
-files		= [f for f in dir_list if os.path.isFile(os.path.join(dataset_path, f)) and f.endswith(".png")]
+files		= [f for f in dir_list if os.path.isfile(os.path.join(dataset_path, f)) and f.endswith(".png")]
 num_dataset	= len(files)
 num_steps	= num_dataset/2
 
