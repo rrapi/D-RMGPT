@@ -28,22 +28,12 @@ import constants
 
 os.environ["OPENAI_API_KEY"] = constants.APIKEY
 
-import socket 
-HOST = "192.168.1.11" # The remote host (PC adress, robot adress is 192.168.1.10)
-PORT = 30000 # The same port as used by the server
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-s.bind((HOST, PORT)) # Bind to the port 
-s.listen(5) # Now wait for client connection.
-c, addr = s.accept()
-print('connected')
-
-
-file_name1='current_step1'+'.png'
-file_name2='current_step2'+'.png'
-cwd = os.getcwd()
-file_path=os.path.join(cwd, 'data', 'Assembly_sequence_images')
-# file_path=r'C:\\Users\\Matteo Forlini\Desktop\\chatgpt-retrieval-main\data\Assembly_sequence_images' 
+cwd 		= os.getcwd()
+dataset_path	= os.path.join(cwd, 'data', 'Assembly_sequence_images')
+dir_list 	= os.listdir(dataset_path)
+files		= [f for f in dir_list if os.path.isFile(os.path.join(dataset_path, f)) and f.endswith(".png")]
+num_dataset	= len(files)
+num_steps	= num_dataset/2
 
 # Function to encode the image
 def encode_image(image_path):
@@ -60,66 +50,34 @@ def write_text_file(file_path, stringa):
         file.write(stringa)
 
 
-text_query = read_text_file("data/response_assistant.txt")
+text_query 			= read_text_file(os.path.join(cwd, 'data', 'response_assistant.txt'))
 
-assistant_robot_planner = read_text_file("data/assistant_robot_planner.txt")
+assistant_robot_planner 	= read_text_file(os.path.join(cwd, 'data', 'assistant_robot_planner.txt'))
 # Path to your image
-image_path_components = "data/components_list.jpg"
+image_path_components 		= os.path.join(cwd, 'data', 'components_list.jpg')
 
 # Getting the base64 string
-base64_image_component_list = encode_image(image_path_components)
+base64_image_component_list 	= encode_image(image_path_components)
 
 
-# Path to your image
-image_path_current_step1 = "data/Assembly_sequence_images/current_step1.png"
-
-image_path_current_step2 = "data/Assembly_sequence_images/current_step2.png"
-
-
-
-camera1=RealSenseCamera(
-    device_id='031522071591',
-    width=640,
-    height=480,
-    fps = 30
-    )
-
-camera1.connect()
-
-camera2=RealSenseCamera(
-    device_id='032622074284',
-    width=640,
-    height=480,
-    fps = 30
-    )
-
-camera2.connect()
 
 client = OpenAI()
 
-step=0
-t_start=time.time()
-brought_objec=[]
-full_set=[1, 2, 3, 4, 5, 6, 7, 8, 9]
-while True:
+step		=0
+t_start		=time.time()
+brought_objec	=[]
+full_set	=[1, 2, 3, 4, 5, 6, 7, 8, 9]
+while step < num_steps:
 
-    t_start_proc=time.time()
-    text_query = read_text_file("data/response_assistant.txt")
-    image1=camera1.get_image_bundle()
-    rgb1 = image1['rgb']
-    playsound(1000, 300)
-    rgb1 = cv2.cvtColor(rgb1, cv2.COLOR_BGR2RGB)
-    cv2.imwrite(os.path.join(file_path, file_name1), rgb1)
+    t_start_proc		= time.time()
+    text_query 			= read_text_file("data/response_assistant.txt")
+    image1			= os.path.join(file_path, f'step_{step+1}_cam1.png')
     # Getting the base64 string
-    base64_image_current_step1 = encode_image(image_path_current_step1)
+    base64_image_current_step1 	= encode_image(image_path_current_step1)
     
-    image2=camera2.get_image_bundle()
-    rgb2 = image2['rgb']
-    playsound(1000, 300)
-    rgb2 = cv2.cvtColor(rgb2, cv2.COLOR_BGR2RGB)
-    cv2.imwrite(os.path.join(file_path, file_name2), rgb2)
+    image2			= os.path.join(file_path, f'step_{step+1}_cam2.png')
     # Getting the base64 string
-    base64_image_current_step2 = encode_image(image_path_current_step2)
+    base64_image_current_step2 	= encode_image(image2)
     
     response = client.chat.completions.create(
       model="gpt-4-vision-preview",
@@ -207,12 +165,10 @@ while True:
 
     
     
-    print(response.__dict__['choices'][0].__dict__['message'].__dict__['content'])
-    write_text_file("data/response_assistant.txt", response.__dict__['choices'][0].__dict__['message'].__dict__['content'])
-    
     components_detected=response.__dict__['choices'][0].__dict__['message'].__dict__['content']
-    
-   
+    print(components_detected)
+    print("RESPONSE")
+    print(response)
     
     response2 = client.chat.completions.create(
       model="gpt-4-vision-preview",
@@ -234,21 +190,19 @@ while True:
       seed=123,
       max_tokens=1000
     )
-    print(response2.__dict__['choices'][0].__dict__['message'].__dict__['content'])
     robot_movements=response2.__dict__['choices'][0].__dict__['message'].__dict__['content']
-    c.send(robot_movements.encode('ascii')); 
+    print(robot_movements)
+    print("RESPONSE2")
+    print(response2)
     print("COMMANDS SENT")
     #robot executes the commands and sends a response containing the number of component delivered
-    data = c.recv(1024)
-    msg=data.decode('ascii')
+    break
     component_delivered=int(msg)
     brought_objec.append(component_delivered)
     t_fin_proc=time.time()
     print(t_fin_proc-t_start_proc)
     if msg=="END":
         print("END")
-        c.close()
-        s.close()
         break
     
     playsound(5000, 200)
