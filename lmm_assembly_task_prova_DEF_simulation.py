@@ -73,7 +73,7 @@ while step < num_steps:
     text_query 			= read_text_file("data/response_assistant.txt")
     image1			= os.path.join(dataset_path, f'step_{step+1}_cam1.png')
     # Getting the base64 string
-    base64_image_current_step1 	= encode_image(image_path_current_step1)
+    base64_image_current_step1 	= encode_image(image1)
     
     image2			= os.path.join(dataset_path, f'step_{step+1}_cam2.png')
     # Getting the base64 string
