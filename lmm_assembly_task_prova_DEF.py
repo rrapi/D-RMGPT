@@ -41,7 +41,9 @@ print('connected')
 
 file_name1='current_step1'+'.png'
 file_name2='current_step2'+'.png'
-file_path=r'C:\\Users\\Matteo Forlini\Desktop\\chatgpt-retrieval-main\data\Assembly_sequence_images' 
+cwd = os.getcwd()
+file_path=os.path.join(cwd, 'data', 'Assembly_sequence_images')
+# file_path=r'C:\\Users\\Matteo Forlini\Desktop\\chatgpt-retrieval-main\data\Assembly_sequence_images' 
 
 # Function to encode the image
 def encode_image(image_path):
@@ -62,7 +64,7 @@ text_query = read_text_file("data/response_assistant.txt")
 
 assistant_robot_planner = read_text_file("data/assistant_robot_planner.txt")
 # Path to your image
-image_path_components = "data/Assembly_sequence_new//components/components_list.jpeg"
+image_path_components = "data/components_list.jpeg"
 
 # Getting the base64 string
 base64_image_component_list = encode_image(image_path_components)
