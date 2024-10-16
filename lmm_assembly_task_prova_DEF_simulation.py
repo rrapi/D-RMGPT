@@ -26,7 +26,10 @@ import numpy as np
 # Set your OpenAI API key
 import constants
 
-os.environ["OPENAI_API_KEY"] = constants.APIKEY
+os.environ["OPENAI_API_KEY"] 	= constants.APIKEY
+token 				= constants.GITHUB_TOKEN
+endpoint 			= "https://models.inference.ai.azure.com"
+model_name 			= constants.MODEL_NAME
 
 cwd 		= os.getcwd()
 dataset_path	= os.path.join(cwd, 'data', 'Assembly_sequence_images')
@@ -61,7 +64,11 @@ base64_image_component_list 	= encode_image(image_path_components)
 
 
 
-client = OpenAI()
+# client = OpenAI()	# with OpenAI key
+client = OpenAI(	# with GitHub token
+	base_url=endpoint
+	api_key=token
+)
 
 step		=0
 t_start		=time.time()
@@ -80,7 +87,7 @@ while step < num_steps:
     base64_image_current_step2 	= encode_image(image2)
     
     response = client.chat.completions.create(
-      model="gpt-3.5-turbo",
+      model=model_name,
       messages=[
 
         {"role": "system","content": "You are a helpful assistant capable of recognizing the presence of an object within an image. I pass you three images: the first one contains a list of all the components and their assembly precendences that you need to locate within the second and third image. The second and third image depict the same object from different angles to help you better understand the scene. Rember that only one component has been added in compared to your previous response. In the previous step, I asked you to identify which components are in the scene and you provided the answer that I am passing to the assistant role. During the identification phase, you need to verify that all the components you have identified meet the assembly precedence requirements defined in the first image. Respond only with a list of components indicating YES if are present, NO if they are not."},
@@ -171,7 +178,7 @@ while step < num_steps:
     print(response)
     
     response2 = client.chat.completions.create(
-      model="gpt-3.5-turbo",
+      model=model_name,
       messages=[
         {"role": "system", "content": "You are a helpful assistant capable of determining the next component for the robot to pick up and delivery to the assembly area. Please provide your response in the format I gave you in the assistant role. Only include the number obtained from the fourth reasoning step in the robot.move_to() command."},
         {"role": "assistant", "content":f"{assistant_robot_planner}"},
