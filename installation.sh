@@ -2,10 +2,10 @@
 
 echo "Installing required libraries..."
 
-apt-get install -y pip
+sudo apt-get install -y pip
+pip install numpy
 pip install -r requirements.txt
-export PATH=$USER/.local/bin:$PATH >> ~/.bashrc
-
-
+export PATH=$HOME/.local/bin:$PATH >> ~/.bashrc
+echo $PATH
 
 echo "Done!"
