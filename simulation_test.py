@@ -181,7 +181,7 @@ while step < num_steps:
     )
 
     components_detected=response.__dict__['choices'][0].__dict__['message'].__dict__['content']
-    write_text_file(text_query, components_detected)
+    write_text_file(os.path.join(cwd, 'data', 'response_assistant.txt'), components_detected)
     print("Detected components:")
     print(components_detected)
     # print("RESPONSE")
@@ -226,7 +226,7 @@ while step < num_steps:
         break
     
     playsound(5000, 200)
-    print("Press any key to proceed...")
+    print("Press [ENTER] key to proceed...")
     input()
     step += 1
 t_end=time.time()
