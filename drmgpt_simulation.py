@@ -16,7 +16,7 @@ try:
     import winsound
 except ImportError:
     def playsound(freq, duration):
-        os.system('play -n -t alsa synth %s sin %s' % (duration/1000, freq))
+        os.system('sudo play -n -t alsa synth %s sin %s' % (duration/1000, freq))
         # os.system('play -nq -t alsa synth {} sine {}'.format(duration/1000, freq))
 else:
     def playsound(freq, duration):
