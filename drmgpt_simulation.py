@@ -52,6 +52,14 @@ def write_text_file(file_path, stringa):
     with open(file_path, 'w') as file:
         file.write(stringa)
 
+def showImage(image_path):
+    # read the image 
+    img = cv2.imread(image_path)
+    # showing the image
+    cv2.imshow('gfg', img)
+    # waiting using waitKey method
+    cv2.waitKey(0)
+
 
 text_query 			              = read_text_file(os.path.join(cwd, 'data', 'response_assistant.txt'))
 assistant_robot_planner 	    = read_text_file(os.path.join(cwd, 'data', 'assistant_robot_planner.txt'))
@@ -78,10 +86,12 @@ while step < num_steps:
     t_start_proc		            = time.time()
     text_query 			            = read_text_file(os.path.join(cwd, 'data', 'response_assistant.txt'))
     image1			                = os.path.join(dataset_path, f'step_{step+1}_cam1.png')
+    showImage(image1)
     # Getting the base64 string
     base64_image_current_step1 	= encode_image(image1)
     
     image2			                = os.path.join(dataset_path, f'step_{step+1}_cam2.png')
+    showImage(image2)
     # Getting the base64 string
     base64_image_current_step2 	= encode_image(image2)
     
