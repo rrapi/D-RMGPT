@@ -181,6 +181,7 @@ while step < num_steps:
     )
 
     components_detected=response.__dict__['choices'][0].__dict__['message'].__dict__['content']
+    write_text_file(text_query, components_detected)
     print("Detected components:")
     print(components_detected)
     # print("RESPONSE")
