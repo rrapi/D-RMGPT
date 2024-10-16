@@ -226,6 +226,7 @@ while step < num_steps:
     
     playsound(5000, 200)
     input()
+    step += 1
 t_end=time.time()
 
 print('T tot',t_end-t_start)
