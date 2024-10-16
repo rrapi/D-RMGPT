@@ -86,12 +86,14 @@ while step < num_steps:
     t_start_proc		            = time.time()
     text_query 			            = read_text_file(os.path.join(cwd, 'data', 'response_assistant.txt'))
     image1			                = os.path.join(dataset_path, f'step_{step+1}_cam1.png')
-    showImage(image1)
+    # showImage(image1)
+    print(f"Image: {image1}")
     # Getting the base64 string
     base64_image_current_step1 	= encode_image(image1)
     
     image2			                = os.path.join(dataset_path, f'step_{step+1}_cam2.png')
-    showImage(image2)
+    # showImage(image2)
+    print(f"Image: {image2}")
     # Getting the base64 string
     base64_image_current_step2 	= encode_image(image2)
     
