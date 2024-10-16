@@ -16,8 +16,8 @@ try:
     import winsound
 except ImportError:
     def playsound(freq, duration):
-        os.system('sudo play -n -t alsa synth %s sin %s' % (duration/1000, freq))
-        # os.system('play -nq -t alsa synth {} sine {}'.format(duration/1000, freq))
+        os.system('sudo play -nq -t alsa synth %s sin %s' % (duration/1000, freq))
+        print("Beep!")
 else:
     def playsound(freq, duration):
         winsound.Beep(freq, duration)
@@ -225,6 +225,7 @@ while step < num_steps:
         break
     
     playsound(5000, 200)
+    print("Press any key to proceed...")
     input()
     step += 1
 t_end=time.time()
