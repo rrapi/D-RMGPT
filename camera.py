@@ -41,25 +41,33 @@ class RealSenseCamera:
 
         # Determine depth scale
         self.scale = cfg.get_device().first_depth_sensor().get_depth_scale()
+        print(f"Camera with id:{self.device_id} connected.")
         return 
     
     def disconnect(self):
         self.pipeline.stop()
+        print(f"Camera with id:{self.device_id} disconnected.")
 
     def get_image_bundle(self):
         frames = self.pipeline.wait_for_frames()
+
+        #color_frame = frames.get_color_frame()
+        #depth_frame = frames.get_depth_frame()
 
         align = rs.align(rs.stream.color)
         aligned_frames = align.process(frames)
         color_frame = aligned_frames.first(rs.stream.color)
 
         color_image = np.asanyarray(color_frame.get_data())
-
+        #depth_image = np.asanyarray(depth_frame.get_data())
 
         return {
             'rgb': color_image,
        
         }
+
+    def show_image(img):
+        plt.imshow(img)
 
    
 

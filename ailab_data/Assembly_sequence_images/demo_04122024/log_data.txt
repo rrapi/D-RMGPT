@@ -1,0 +1,219 @@
+robot@panda2:~/ros/catkin_ws/src/D-RMGPT$ python ailab_experiment_setup.py 
+Camera with id:043322071223 connected.
+Camera with id:109122072393 connected.
+
+1. Chassis: YES
+2. Motor: NO
+3. Body: NO
+4. Wheels: NO
+5. Intake: NO
+6. Front bumper: NO
+7. Roof: NO
+8. Spoiler: NO
+9. Lateral bumpers: NO
+Robot Movements:
+robot.move_to(2)
+robot.close_gripper()
+robot.move_to(delivering_pose)
+robot.open_gripper()
+robot.move_to(home_pose)
+Delivered component n. 2
+25.91050148010254 seconds
+
+Press [ENTER] key to proceed...
+
+1. Chassis: YES
+2. Motor: NO
+3. Body: NO
+4. Wheels: NO
+5. Intake: NO
+6. Front bumper: NO
+7. Roof: NO
+8. Spoiler: NO
+9. Lateral bumpers: NO
+Robot Movements:
+robot.move_to(1)
+robot.close_gripper()
+robot.move_to(delivering_pose)
+robot.open_gripper()
+robot.move_to(home_pose)
+Delivered component n. 1
+42.74501347541809 seconds
+
+Press [ENTER] key to proceed...
+
+1. Chassis: YES
+2. Motor: YES
+3. Body: NO
+4. Wheels: NO
+5. Intake: NO
+6. Front bumper: NO
+7. Roof: NO
+8. Spoiler: NO
+9. Lateral bumpers: NO
+Robot Movements:
+robot.move_to(3)
+robot.close_gripper()
+robot.move_to(delivering_pose)
+robot.open_gripper()
+robot.move_to(home_pose)
+Delivered component n. 3
+20.51190495491028 seconds
+
+Press [ENTER] key to proceed...
+
+1. Chassis: YES
+2. Motor: YES
+3. Body: YES
+4. Wheels: NO
+5. Intake: NO
+6. Front bumper: NO
+7. Roof: NO
+8. Spoiler: NO
+9. Lateral bumpers: NO
+Robot Movements:
+robot.move_to(4)
+robot.close_gripper()
+robot.move_to(delivering_pose)
+robot.open_gripper()
+robot.move_to(home_pose)
+Delivered component n. 4
+35.456984519958496 seconds
+
+Press [ENTER] key to proceed...
+
+1. Chassis: YES
+2. Motor: YES
+3. Body: YES
+4. Wheels: YES
+5. Intake: NO
+6. Front bumper: NO
+7. Roof: NO
+8. Spoiler: NO
+9. Lateral bumpers: NO
+Robot Movements:
+robot.move_to(1)
+robot.close_gripper()
+robot.move_to(delivering_pose)
+robot.open_gripper()
+robot.move_to(home_pose)
+Delivered component n. 1
+17.021387577056885 seconds
+
+Press [ENTER] key to proceed...
+
+1. Chassis: YES
+2. Motor: YES
+3. Body: YES
+4. Wheels: YES
+5. Intake: NO
+6. Front bumper: NO
+7. Roof: NO
+8. Spoiler: NO
+9. Lateral bumpers: NO
+Robot Movements:
+robot.move_to(5)
+robot.close_gripper()
+robot.move_to(delivering_pose)
+robot.open_gripper()
+robot.move_to(home_pose)
+Delivered component n. 5
+36.781864643096924 seconds
+
+Press [ENTER] key to proceed...
+
+1. Chassis: YES
+2. Motor: YES
+3. Body: YES
+4. Wheels: YES
+5. Intake: YES
+6. Front bumper: NO
+7. Roof: NO
+8. Spoiler: NO
+9. Lateral bumpers: NO
+Robot Movements:
+robot.move_to(6)
+robot.close_gripper()
+robot.move_to(delivering_pose)
+robot.open_gripper()
+robot.move_to(home_pose)
+Delivered component n. 6
+14.47118878364563 seconds
+
+Press [ENTER] key to proceed...
+
+1. Chassis: YES
+2. Motor: YES
+3. Body: YES
+4. Wheels: YES
+5. Intake: YES
+6. Front bumper: YES
+7. Roof: NO
+8. Spoiler: NO
+9. Lateral bumpers: NO
+Robot Movements:
+robot.move_to(7)
+robot.close_gripper()
+robot.move_to(delivering_pose)
+robot.open_gripper()
+robot.move_to(home_pose)
+Delivered component n. 7
+13.147433996200562 seconds
+
+Press [ENTER] key to proceed...
+
+1. Chassis: YES
+2. Motor: YES
+3. Body: YES
+4. Wheels: YES
+5. Intake: YES
+6. Front bumper: YES
+7. Roof: YES
+8. Spoiler: NO
+9. Lateral bumpers: NO
+Robot Movements:
+robot.move_to(8)
+robot.close_gripper()
+robot.move_to(delivering_pose)
+robot.open_gripper()
+robot.move_to(home_pose)
+Delivered component n. 8
+17.181621313095093 seconds
+
+Press [ENTER] key to proceed...
+
+1. Chassis: YES
+2. Motor: YES
+3. Body: YES
+4. Wheels: YES
+5. Intake: YES
+6. Front bumper: YES
+7. Roof: YES
+8. Spoiler: YES
+9. Lateral bumpers: NO
+Robot Movements:
+robot.move_to(9)
+robot.close_gripper()
+robot.move_to(delivering_pose)
+robot.open_gripper()
+robot.move_to(home_pose)
+Delivered component n. 9
+9.559532165527344 seconds
+
+Press [ENTER] key to proceed...
+
+1. Chassis: YES
+2. Motor: YES
+3. Body: YES
+4. Wheels: YES
+5. Intake: YES
+6. Front bumper: YES
+7. Roof: YES
+8. Spoiler: YES
+9. Lateral bumpers: YES
+Robot Movements:
+robot.move_to()
+Traceback (most recent call last):
+  File "ailab_experiment_setup.py", line 258, in <module>
+    component_delivered   =int(msg)
+ValueError: invalid literal for int() with base 10: ')'

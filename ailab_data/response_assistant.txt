@@ -1,0 +1,9 @@
+1. Chassis: YES
+2. Motor: NO
+3. Body: NO
+4. Wheels: NO
+5. Intake: NO
+6. Front bumper: NO
+7. Roof: NO
+8. Spoiler: NO
+9. Lateral bumpers: NO
