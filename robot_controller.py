@@ -21,10 +21,10 @@ class RobotController():
     def send_pose(self, pose):
         if self.rtde_c.isConnected():
             self.rtde_c.moveL(pose)
-            
-    def send_path(self, path):
+
+    def send_joints(self, joint_angles):
         if self.rtde_c.isConnected():
-            self.rtde_c.moveL(path)
+            self.rtde_c.moveJ(joint_angles)
 
     def get_tcp_pose(self):
         if self.rtde_r.isConnected():
@@ -35,13 +35,11 @@ class RobotController():
         if not self.rtde_r.getDigitalOutState(self.openGripperDO):
             self.rtde_io.setStandardDigitalOut(self.openGripperDO, True)
             time.sleep(0.01)
-            self.rtde_io.setStandardDigitalOut(self.openGripperDO, False)
 
     def close_gripper(self):
         if not self.rtde_r.getDigitalOutState(self.closeGripperDO):
             self.rtde_io.setStandardDigitalOut(self.closeGripperDO, True)
             time.sleep(0.01)
-            self.rtde_io.setStandardDigitalOut(self.closeGripperDO, False)
             
 
 

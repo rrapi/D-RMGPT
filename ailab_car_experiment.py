@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 
+from ailab_data.setup import *
 import constants
 import os
 from openai import OpenAI
 import base64
 from camera import RealSenseCamera
 import matplotlib.pyplot as plt
-import rtde_control
+# import rtde_control
 import time
 import cv2
-import numpy as np
+# import numpy as np
 import constants
-import socket
+# import socket
 from robot_controller import RobotController
 try:
     import winsound
@@ -67,6 +68,24 @@ if __name__ == '__main__':
 
     # UR5e_controller.send_pose(target_pose)
     # del UR5e_controller
+
+
+    UR5e = RobotController("172.16.0.2", 0, 1)
+    UR5e.send_joints(home_joints)
+
+    curr_pose = UR5e.get_tcp_pose()
+
+    next_pose = curr_pose.copy()
+    next_pose[2] = next_pose[2] - 0.1
+    UR5e.send_pose(next_pose)
+    UR5e.close_gripper()
+
+    next_pose[2] = next_pose[2] + 0.1
+    UR5e.send_pose(next_pose)
+
+    UR5e.open_gripper()
+
+    exit()
 
 
 
