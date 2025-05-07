@@ -50,8 +50,7 @@ def show_image(img):
     cv2.waitKey(0)
 
 
-
-if __name__ == '__main__':
+def main():
 
     # Set your OpenAI API key
     os.environ["OPENAI_API_KEY"] = constants.APIKEY
@@ -59,21 +58,17 @@ if __name__ == '__main__':
 
     DATA_DIR                     = 'ailab_data'
 
-    # UR5e_controller = RobotController('172.16.0.2')
-
-    # curr_pose = UR5e_controller.get_tcp_pose()
-
-    # target_pose = curr_pose.copy()
-    # target_pose[2] = target_pose[2] + 0.1
-
-    # UR5e_controller.send_pose(target_pose)
-    # del UR5e_controller
-
-
     UR5e = RobotController("172.16.0.2", 0, 1)
-    UR5e.send_joints(home_joints)
+    UR5e.close_gripper()
+    UR5e.open_gripper()
 
     curr_pose = UR5e.get_tcp_pose()
+    print(curr_pose)
+
+
+    UR5e.send_joints(array_deg_to_rad(home_joints))
+
+    return
 
     next_pose = curr_pose.copy()
     next_pose[2] = next_pose[2] - 0.1
@@ -85,7 +80,7 @@ if __name__ == '__main__':
 
     UR5e.open_gripper()
 
-    exit()
+    
 
 
 
@@ -303,3 +298,6 @@ if __name__ == '__main__':
     print('T tot',t_end-t_start)
 
 
+
+if __name__ == '__main__':
+    main()
