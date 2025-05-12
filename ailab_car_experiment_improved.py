@@ -66,28 +66,7 @@ def main():
     UR5e = RobotController("172.16.0.2", 0, 1)
     # UR5e.close_gripper()
     UR5e.open_gripper()
-
-    # curr_pose = UR5e.get_tcp_pose()
-    # print(f'Current pose: {curr_pose}')
-    # next_pose = curr_pose.copy()
-    # next_pose[2] = next_pose[2] - 0.1
-    # print(f'Next pose: {next_pose}')
-    # UR5e.send_pose(next_pose)
-
-    curr_joints = UR5e.get_joint_positions()
-    print(f'Current joints: {curr_joints}')
-    print(f'Target joints: {array_deg_to_rad(home_joints)}')
     UR5e.send_joints(array_deg_to_rad(home_joints))
-
-    # remote host connection
-    # HOST = "192.168.1.11" # The remote host (PC adress, robot adress is 192.168.1.10)
-    # PORT = 30000 # The same port as used by the server
-    # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    # s.bind((HOST, PORT)) # Bind to the port 
-    # s.listen(5) # Now wait for client connection.
-    # c, addr = s.accept()
-    # print('connected')
 
 
     file_name1                  = 'current_step1.png'
@@ -110,10 +89,6 @@ def main():
         )
     camera1.connect()
 
-    # image1              = camera1.get_image_bundle()
-    # rgb1                = image1['rgb']
-    # show_image(rgb1)
-
     camera2=RealSenseCamera(
         device_id='043322071223',
         width=640,
@@ -122,10 +97,6 @@ def main():
         )
     camera2.connect()
 
-    # image2              = camera2.get_image_bundle()
-    # rgb2                = image2['rgb']
-    # show_image(rgb2)
-
     # delivery_pose_tmp = delivery_pose.copy()
     delivery_pose_tmp = array_cm_to_m(delivery_pose) + array_deg_to_rad(tool_orientation)
 
@@ -133,7 +104,7 @@ def main():
     client = OpenAI()
     step = 1
     t_start         = time.time()
-    brought_objec   = [1,2,3,4,5,6,7,8]
+    brought_objec   = []
     full_set        = list(range(1, len(object_positions)+1)) #[1, 2, 3, 4, 5, 6, 7, 8, 9]
     while True:
 
