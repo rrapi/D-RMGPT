@@ -2,6 +2,47 @@ from rtde_receive import RTDEReceiveInterface as RTDEReceive
 from rtde_control import RTDEControlInterface as RTDEControl
 from rtde_io import RTDEIOInterface as RTDEIo
 import time
+import math
+
+class Pose():
+    def __init__(self, x, y, z, rx, ry, rz) -> None:
+        self.x = x
+        self.y = y
+        self.z = z
+        self.rx = rx
+        self.ry = ry
+        self.rz = rz
+
+    def set_x(self, x):
+        self.x = x
+
+    def set_y(self, y):
+        self.y = y
+
+    def set_z(self, z):
+        self.z = z
+
+    def set_rx(self, rx):
+        self.rx = rx
+
+    def set_ry(self, ry):
+        self.ry = ry
+
+    def set_rz(self, rz):
+        self.rz = rz
+
+    def get_pose(self):
+        return [
+            self.x,
+            self.y,
+            self.z,
+            self.rx,
+            self.ry,
+            self.rz
+        ]
+    
+def targetPoseReached(curr_pose:Pose, goal_pose:Pose, epsilon):
+    return math.sqrt((goal_pose.x-curr_pose.x)**2 + (goal_pose.y-curr_pose.y)**2 + (goal_pose.z-curr_pose.z)**2) < epsilon
 
 
 class RobotController():
@@ -20,13 +61,26 @@ class RobotController():
         self.rtde_r.disconnect()
         self.rtde_io.disconnect()
 
-    def send_pose(self, pose):
+    def send_pose(self, pose:Pose, epsilon=0.001, verbose=True):
         if self.rtde_c.isConnected():
             self.rtde_c.moveL(pose)
+            while not targetPoseReached(Pose(*self.get_tcp_pose()), Pose(*pose), epsilon):
+                pass
+            if verbose:
+                print("Goal pose reached")
 
-    def send_joints(self, joint_angles):
+    # def isTargetPoseReached(self, target_pose, epsilon):
+    #     curr_pose = self.get_tcp_pose()
+
+
+
+    def send_joints(self, joint_angles, verbose=True):
         if self.rtde_c.isConnected():
             self.rtde_c.moveJ(joint_angles)
+            while not self.rtde_c.isSteady():
+                pass
+            if verbose:
+                print("Goal joints reached")
 
     def get_tcp_pose(self):
         if self.rtde_r.isConnected():
@@ -58,3 +112,18 @@ class RobotController():
             
 
 
+# if __name__ == "__main__":
+
+#     UR5e = RobotController("172.16.0.2", 0, 1)
+#     UR5e.close_gripper()
+#     UR5e.open_gripper()
+
+#     curr_pose = UR5e.get_tcp_pose()
+#     print(f'Current pose: {curr_pose}')
+#     next_pose = curr_pose.copy()
+#     next_pose[2] = next_pose[2] - 0.1
+#     print(f'Next pose: {next_pose}')
+#     UR5e.send_pose(next_pose)
+
+#     curr_joints = UR5e.get_joint_positions()
+#     print(f'Current joints: {curr_joints}')

@@ -3,6 +3,7 @@
 from ailab_data.setup import *
 import constants
 import os
+import argparse
 from openai import OpenAI
 import base64
 from camera import RealSenseCamera
@@ -13,7 +14,7 @@ import cv2
 # import numpy as np
 import constants
 # import socket
-from robot_controller import RobotController
+from robot_controller import RobotController, Pose
 try:
     import winsound
 except ImportError:
@@ -25,6 +26,8 @@ else:
         winsound.Beep(freq, duration)
 
 
+parser = argparse.ArgumentParser(description='Input arguments')
+parser.add_argument('data_dir', type=str, help='Directory of experiment data')
 
 
 # Function to encode the image
@@ -45,7 +48,7 @@ def show_image(img):
     # read the image 
     # img = cv2.imread(image_path)
     # showing the image
-    cv2.imshow('gfg', img)
+    cv2.imshow('RealSense', img)
     # waiting using waitKey method
     cv2.waitKey(0)
 
@@ -56,33 +59,25 @@ def main():
     os.environ["OPENAI_API_KEY"] = constants.APIKEY
     model_name 			         = constants.MODEL_NAME
 
-    DATA_DIR                     = 'ailab_data'
+    # DATA_DIR                     = 'ailab_data'
+    args = parser.parse_args()
+    DATA_DIR = args.data_dir
 
     UR5e = RobotController("172.16.0.2", 0, 1)
-    UR5e.close_gripper()
+    # UR5e.close_gripper()
     UR5e.open_gripper()
 
-    curr_pose = UR5e.get_tcp_pose()
-    print(curr_pose)
+    # curr_pose = UR5e.get_tcp_pose()
+    # print(f'Current pose: {curr_pose}')
+    # next_pose = curr_pose.copy()
+    # next_pose[2] = next_pose[2] - 0.1
+    # print(f'Next pose: {next_pose}')
+    # UR5e.send_pose(next_pose)
 
-
+    curr_joints = UR5e.get_joint_positions()
+    print(f'Current joints: {curr_joints}')
+    print(f'Target joints: {array_deg_to_rad(home_joints)}')
     UR5e.send_joints(array_deg_to_rad(home_joints))
-
-    return
-
-    next_pose = curr_pose.copy()
-    next_pose[2] = next_pose[2] - 0.1
-    UR5e.send_pose(next_pose)
-    UR5e.close_gripper()
-
-    next_pose[2] = next_pose[2] + 0.1
-    UR5e.send_pose(next_pose)
-
-    UR5e.open_gripper()
-
-    
-
-
 
     # remote host connection
     # HOST = "192.168.1.11" # The remote host (PC adress, robot adress is 192.168.1.10)
@@ -94,6 +89,7 @@ def main():
     # c, addr = s.accept()
     # print('connected')
 
+
     file_name1                  = 'current_step1.png'
     file_name2                  = 'current_step2.png'
     cwd                         = os.getcwd()
@@ -104,49 +100,62 @@ def main():
     # Getting the base64 string of components list image
     base64_image_component_list 	= encode_image(os.path.join(cwd, DATA_DIR, 'components_list.jpg'))
 
+    # RealSenseCamera.check_available_devices()
+
     camera1=RealSenseCamera(
-        device_id='043322071223',
+        device_id='109122072393',
         width=640,
         height=480,
         fps = 30
         )
     camera1.connect()
 
+    # image1              = camera1.get_image_bundle()
+    # rgb1                = image1['rgb']
+    # show_image(rgb1)
+
     camera2=RealSenseCamera(
-        device_id='109122072393',
+        device_id='043322071223',
         width=640,
         height=480,
         fps = 30
         )
     camera2.connect()
 
+    # image2              = camera2.get_image_bundle()
+    # rgb2                = image2['rgb']
+    # show_image(rgb2)
+
+    # delivery_pose_tmp = delivery_pose.copy()
+    delivery_pose_tmp = array_cm_to_m(delivery_pose) + array_deg_to_rad(tool_orientation)
+
     # connection to OpenAI APIs
     client = OpenAI()
     step = 1
     t_start         = time.time()
     brought_objec   = []
-    full_set        = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    full_set        = list(range(1, len(object_positions)+1)) #[1, 2, 3, 4, 5, 6, 7, 8, 9]
     while True:
 
         t_start_proc        = time.time()
         text_query          = read_text_file(os.path.join(cwd, DATA_DIR, 'response_assistant.txt'))
-        image1              = camera1.get_image_bundle()
-        rgb1                = image1['rgb']
+        image_up              = camera1.get_image_bundle()
+        rgb_up                = image_up['rgb']
         playsound(1000, 300)
-        rgb1                = cv2.cvtColor(rgb1, cv2.COLOR_BGR2RGB)
-        cv2.imwrite(os.path.join(file_path, file_name1), rgb1)
-        cv2.imwrite(os.path.join(file_path, f'step{step}_cam1.png'), rgb1)
-        show_image(rgb1)
+        rgb_up                = cv2.cvtColor(rgb_up, cv2.COLOR_BGR2RGB)
+        cv2.imwrite(os.path.join(file_path, file_name1), rgb_up)
+        cv2.imwrite(os.path.join(file_path, f'step{step}_cam1.png'), rgb_up)
+        # show_image(rgb_up)
         # Getting the base64 string
         base64_image_current_step1 = encode_image(os.path.join(file_path, file_name1))
         
-        image2              = camera2.get_image_bundle()
-        rgb2                = image2['rgb']
+        image_side              = camera2.get_image_bundle()
+        rgb_side                = image_side['rgb']
         playsound(1000, 300)
-        rgb2                = cv2.cvtColor(rgb2, cv2.COLOR_BGR2RGB)
-        cv2.imwrite(os.path.join(file_path, file_name2), rgb2)
-        cv2.imwrite(os.path.join(file_path, f'step{step}_cam2.png'), rgb2)
-        show_image(rgb2)
+        rgb_side                = cv2.cvtColor(rgb_side, cv2.COLOR_BGR2RGB)
+        cv2.imwrite(os.path.join(file_path, file_name2), rgb_side)
+        cv2.imwrite(os.path.join(file_path, f'step{step}_cam2.png'), rgb_side)
+        # show_image(rgb_side)
         # Getting the base64 string
         base64_image_current_step2 = encode_image(os.path.join(file_path, file_name2))
         
@@ -269,15 +278,69 @@ def main():
         print(robot_movements)
         msg                   = robot_movements.strip().split('\n')[0]
         msg                   = msg.split('move_to')[1][1]
-        component_delivered   = int(msg)
+        if msg=="END":
+            print("END")
+            break
+
+        component = int(msg)
+        assert component > 0 and component < len(object_positions)
+        object_pose =  array_cm_to_m(object_positions[component-1]) + array_deg_to_rad(tool_orientation)
         
+        if component == 4:
+            n = 4
+        elif component == 9:
+            n = 2
+        else:
+            n = 1
+
+        x_offset = cm_to_m(x_axis_offset[component-1])
+
+        for i in range(n):
+            target_pose = Pose(*object_pose)
+            x_offset_curr = i*x_offset
+
+            target_pose.set_x(target_pose.x + x_offset_curr)
+            target_pose.set_z(target_pose.z + cm_to_m(PICK_HEIGHT))
+            UR5e.send_pose(target_pose.get_pose())
+
+            target_pose.set_z(target_pose.z - cm_to_m(PICK_HEIGHT))
+            UR5e.send_pose(target_pose.get_pose())
+
+            UR5e.close_gripper()
+
+            target_pose.set_z(target_pose.z + cm_to_m(PICK_HEIGHT))
+            UR5e.send_pose(target_pose.get_pose())
+
+            # =========
+    
+            target_pose = Pose(*delivery_pose_tmp)
+
+            target_pose.set_z(target_pose.z + cm_to_m(PICK_HEIGHT))
+            UR5e.send_pose(target_pose.get_pose())
+           
+            target_pose.set_z(target_pose.z - cm_to_m(PICK_HEIGHT))
+            UR5e.send_pose(target_pose.get_pose())
+            
+            UR5e.open_gripper()
+
+            target_pose.set_z(target_pose.z + cm_to_m(PICK_HEIGHT))
+            UR5e.send_pose(target_pose.get_pose())
+
+            # =========
+
+            UR5e.send_joints(array_deg_to_rad(home_joints))
+
+            if i != n-1:
+                print("Press [ENTER] key to proceed...")
+                input()
+
         # c.send(robot_movements.encode('ascii')); 
         # print("COMMANDS SENT")
         # #robot executes the commands and sends a response containing the number of component delivered
         # data        = c.recv(1024)
         # msg         = data.decode('ascii')
-        # component_delivered=int(msg)
-        brought_objec.append(component_delivered)
+        # component=int(msg)
+        brought_objec.append(component)
         t_fin_proc  = time.time()
         print(t_fin_proc-t_start_proc)
         if msg=="END":

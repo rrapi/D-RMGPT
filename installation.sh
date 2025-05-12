@@ -9,7 +9,7 @@
 
 echo "Installing required libraries..."
 
-sudo apt-get install -y --no-install-recommends pip sox
+sudo apt-get update && apt-get install -y --no-install-recommends pip sox
 pip install -r requirements.txt
 pip install matplotlib pyrealsense2
 

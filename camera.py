@@ -21,17 +21,31 @@ class RealSenseCamera:
         self.pipeline = None
         self.scale = None
         self.intrinsics = None
-        
-    
-        
+
+    def __del__(self):
+        self.pipeline.stop()
+        print(f"Camera with id:{self.device_id} disconnected.")
+
+    def check_available_devices():
+        connect_device = []
+        for d in rs.context().devices:
+            if d.get_info(rs.camera_info.name).lower() != 'platform camera':
+                serial = d.get_info(rs.camera_info.serial_number)
+                product_line = d.get_info(rs.camera_info.product_line)
+                device_info = (serial, product_line)  # (serial_number, product_line)
+                connect_device.append(device_info[0])
+        print(connect_device)
 
     def connect(self):
         # Start and configure
         self.pipeline = rs.pipeline()
         config = rs.config()
         config.enable_device(self.device_id)  
+        print('device enabled!!')
        
         config.enable_stream(rs.stream.color, self.width, self.height, rs.format.rgb8, self.fps)
+        # config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, self.fps)
+        # config.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, self.fps)
         cfg = self.pipeline.start(config)
         
 
@@ -43,10 +57,6 @@ class RealSenseCamera:
         self.scale = cfg.get_device().first_depth_sensor().get_depth_scale()
         print(f"Camera with id:{self.device_id} connected.")
         return 
-    
-    def disconnect(self):
-        self.pipeline.stop()
-        print(f"Camera with id:{self.device_id} disconnected.")
 
     def get_image_bundle(self):
         frames = self.pipeline.wait_for_frames()
@@ -56,19 +66,19 @@ class RealSenseCamera:
 
         align = rs.align(rs.stream.color)
         aligned_frames = align.process(frames)
-        color_frame = aligned_frames.first(rs.stream.color)
 
+        color_frame = aligned_frames.first(rs.stream.color)
         color_image = np.asanyarray(color_frame.get_data())
-        #depth_image = np.asanyarray(depth_frame.get_data())
+
+        # aligned_depth_frame = aligned_frames.get_depth_frame()
+        # depth_image = np.asarray(aligned_depth_frame.get_data(), dtype=np.float32)
+        # depth_image *= self.scale
+        # depth_image = np.expand_dims(depth_image, axis=2)
 
         return {
             'rgb': color_image,
-       
+            # 'depth': depth_image
         }
-
-    def show_image(img):
-        plt.imshow(img)
-
    
 
 if __name__ == '__main__':

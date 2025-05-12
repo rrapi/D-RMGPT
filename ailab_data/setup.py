@@ -20,6 +20,10 @@ def array_deg_to_rad(array):
 def array_rad_to_deg(array):
     return [math.degrees(x) for x in array]
 
+def object_to_pose(i, object_positions, tool_orientation):
+    assert i > 0 and i < len(object_positions)
+    return cm_to_m(object_positions[i-1]) + array_deg_to_rad(tool_orientation)
+
 # object poses in cm
 object_positions = [
 
