@@ -1,29 +1,3 @@
-import math
-import numpy as np
-
-def cm_to_m(x, dec = 4):
-    return round(x/100,dec)
-
-def array_cm_to_m(array):
-    n = np.ndim(array)
-    if n == 1:
-        res = [cm_to_m(x) for x in array]
-    elif n == 2:
-        res = [[cm_to_m(y) for y in x] for x in array]
-    else:
-        print("Conversion not implemented.")
-    return res
-
-def array_deg_to_rad(array):
-    return [math.radians(x) for x in array]
-
-def array_rad_to_deg(array):
-    return [math.degrees(x) for x in array]
-
-def object_to_pose(i, object_positions, tool_orientation):
-    assert i > 0 and i < len(object_positions)
-    return cm_to_m(object_positions[i-1]) + array_deg_to_rad(tool_orientation)
-
 # object poses in cm
 object_positions = [
 

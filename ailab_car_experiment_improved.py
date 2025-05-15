@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from ailab_data.setup import *
+from utils import *
 import constants
 import os
 import argparse
@@ -12,7 +13,6 @@ import matplotlib.pyplot as plt
 import time
 import cv2
 # import numpy as np
-import constants
 # import socket
 from robot_controller import RobotController, Pose
 try:
@@ -52,6 +52,18 @@ def show_image(img):
     # waiting using waitKey method
     cv2.waitKey(0)
 
+def increase_brightness(img, value=30):
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    h, s, v = cv2.split(hsv)
+
+    lim = 255 - value
+    v[v > lim] = 255
+    v[v <= lim] += value
+
+    final_hsv = cv2.merge((h, s, v))
+    img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+    return img
+
 
 def main():
 
@@ -64,7 +76,6 @@ def main():
     DATA_DIR = args.data_dir
 
     UR5e = RobotController("172.16.0.2", 0, 1)
-    # UR5e.close_gripper()
     UR5e.open_gripper()
     UR5e.send_joints(array_deg_to_rad(home_joints))
 
@@ -96,6 +107,9 @@ def main():
         fps = 30
         )
     camera2.connect()
+
+    product = "toy car model"
+    task    = "assembly"
 
     # delivery_pose_tmp = delivery_pose.copy()
     delivery_pose_tmp = array_cm_to_m(delivery_pose) + array_deg_to_rad(tool_orientation)
@@ -129,6 +143,94 @@ def main():
         # show_image(rgb_side)
         # Getting the base64 string
         base64_image_current_step2 = encode_image(os.path.join(file_path, file_name2))
+
+
+
+        sequence = client.chat.completions.create(
+        model=model_name,
+        messages=[
+
+            {"role": "system","content": f"You are an helpful assistant for the {task} of a {product}. In the uploaded image you can find the components of the product to be assembled and their precedence relationships. Please give as output a valid sequence of the components to be assembled in order (in the form: 1 -> 2 -> 5 and so on) satisfying the dependencies."},
+            {"role": "assistant","content": f"{text_query}"},
+
+            {
+            "role": "user",
+            "content": [
+                {
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/jpeg;base64,{base64_image_component_list}",
+                    "detail": "high"
+                },
+                },
+                {
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/png;base64,{base64_image_current_step1}",
+                    "detail": "high"
+                },
+                },
+                {
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/png;base64,{base64_image_current_step2}",
+                    "detail": "high"
+                },
+                },
+                {
+                "type": "text",
+                "text":"1- Chassis - Is present in the second and third image? YES or NO",
+                
+                },
+                {
+                "type": "text",
+                "text":"2- Motor - Is present in the second and third image? YES or NO",
+                
+                },
+                {
+                "type": "text",
+                "text":"3- Body - Is present in the second and third image? YES or NO",
+                
+                },
+                {
+                "type": "text",
+                "text":"4- Wheels - Is present in the second and third image? YES or NO",
+                
+                },
+                {
+                "type": "text",
+                "text":"5- Intake - Is present in the second and third image? YES or NO",
+                
+                },
+                {
+                "type": "text",
+                "text":"6- Front bumper - Is present in the second and third image? YES or NO",
+                
+                },
+                {
+                "type": "text",
+                "text":" 7- Roof - Is present in the second and third image? YES or NO",
+                
+                },
+                {
+                "type": "text",
+                "text":"8- Spoiler - Is present in the second and third image? YES or NO",
+                },
+                {
+                "type": "text",
+                "text":"9- Lateral bumpers - Is present in the second and third image? YES or NO.",
+                },
+                
+
+            ],
+            },
+            ],
+
+        max_tokens=1000,
+        top_p=0,
+        temperature=0,
+        seed=123
+        )
         
         response = client.chat.completions.create(
         model=model_name,
