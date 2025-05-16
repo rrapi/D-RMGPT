@@ -22,7 +22,7 @@ except ImportError:
 else:
     def playsound(freq, duration):
         winsound.Beep(freq, duration)
-
+    
 
 
 class ProductFormat(BaseModel):
@@ -33,7 +33,7 @@ class ProductFormat(BaseModel):
    valid_sequence: bool
 
 class TaskFormat(BaseModel):
-   brought_components: List[int]
+#    brought_components: List[int]
    next_component: int
 
 
@@ -54,6 +54,14 @@ class Task():
     def set_task_status(self, new_status:TaskFormat):
         self.current_status = new_status
 
+    def __str__(self):
+        # res = f"[INFO] Predicted components: {self.current_status.brought_components}\n" \
+        #     + f"[INFO] Next component: {self.current_status.next_component}"
+
+        res = f"[INFO] Next component: {self.current_status.next_component}"
+        
+        return res 
+
 class Product():
     def __init__(self, name, info:ProductFormat=None):
         self.name = name
@@ -62,11 +70,16 @@ class Product():
     def set_product_info(self, new_info:ProductFormat):
         self.info = new_info
 
+    def get_sequence_string(self, sep=' -> '):
+        return sep.join(map(str, self.info.sequence))
+
     def __str__(self):
-        res = f"Product name: {self.name}\n \
-            Components: {self.info.component_names}\n \
-            Dependencies: {self.info.precedences}\n \
-            Possible valid sequence: {print_sequence(self.info.sequence, ' -> ')}"
+        res = f"[INFO] Product name: {self.name}\n" \
+            + f"[INFO] Components: {self.info.component_names}\n" \
+            + f"[INFO] Dependencies: {self.info.precedences}"
+        
+        if self.info.valid_sequence:
+            res += f"\n[INFO] Possible valid sequence: {self.get_sequence_string()}"
 
         return res 
 
@@ -76,6 +89,12 @@ class Env():
         self.home_joints = home_joints
         self.delivery_pose = delivery_pose
         self.object_positions = object_positions
+
+
+# class Feedback():
+#     def __init__(self):
+#         self.OK = ""
+#         self.NotOK = ""
 
 # class Experiment():
 #     def __init__(self, model, home_pose, delivery_pose, product_name, task, domain, product_info:ProductFormat=None, current_status:TaskFormat=None):
@@ -185,7 +204,6 @@ def main():
        return
     
     print(product)
-    # print(f"[INFO] Possible valid sequence found for the {task} of the {product}: {print_sequence(product.info.sequence, ' -> ')}.")
 
     num_components = len(product.info.numbered_components)
 
@@ -230,21 +248,23 @@ def main():
             messages=[
 
                 # {"role": "system","content": f"You are an helpful assistant for the {task} of a {product}. In the uploaded image you can find the components of the product to be assembled and their precedence relationships. Please give as output a valid sequence of the components to be assembled in order (in the form: 1 -> 2 -> 5 and so on) as a Python list satisfying the dependencies. If a sequence cannot be found, return a False bool variable"},
-                {"role": "system","content": f"You are an helpful reasoning and planning agent for the {task} of a {product} in {domain} industry domain for collaborative robotics."},
+                {"role": "system","content": f"You are an helpful reasoning and planning agent for the {task.name} of a {product.name} in {task.domain} industry domain for collaborative robotics."},
                 # {"role": "user", "content": f"In the first uploaded image you can find the components of the finished product."},
-                {"role": "user", "content": f"The task understanding agent perceived and extracted {product} components information, saved in {product_info}."},
-                {"role": "user", "content": f"The two uploaded images depict the current product status during the {task} process from different angles to help you better understand the scene."},
-                {"role": "user", "content": f"Based on the perception made in the first step by the task understanding agent, predict the {product} components present in the current {task} status and the next component to be pass to the human operator."},
+                # {"role": "user", "content": f"The task understanding agent perceived and extracted {product.name} components information, saved in {product.info}."},
+                {"role": "user", "content": f"In the first uploaded image you can find the components of the product and their precedence relationships."},
+                {"role": "user", "content": f"The second and third uploaded images depict the current product status during the {task.name} process from different angles to help you better understand the scene."},
+                {"role": "user", "content": f"Predict the next component that needs to be processed by the human operator for the {task.name} task. The next component must not belong to {brought_objec} and must not violate the precedence relationships of the {product.name}."},
+                # {"role": "user", "content": f"Predict the {product.name} components present in the current {task.name} status and the next component that needs to be processed."},
                 {
                 "role": "user",
                 "content": [
-                    # {
-                    # "type": "image_url",
-                    # "image_url": {
-                    #     "url": f"data:image/jpeg;base64,{base64_image_component_list}",
-                    #     "detail": "high"
-                    # },
-                    # },
+                    {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{base64_image_component_list}",
+                        "detail": "high"
+                    },
+                    },
                     {
                     "type": "image_url",
                     "image_url": {
@@ -274,14 +294,73 @@ def main():
         # answer = response.__dict__['choices'][0].__dict__['message'].__dict__['content']
         # print(answer)
 
-        predicted_components    = task.current_status.brought_components
+        print(task)
 
-        if component is not None:
-            if predicted_components != brought_objec + component:
-                print("[WARNING] Incompatibility")
+        # predicted_components = task.current_status.brought_components
+        
+        # if not equal_set(predicted_components, brought_objec):
+        #     print("[WARNING] Incompatibility")
 
-        component               = task.current_status.next_component
+        #     diff_elements = [e not in brought_objec for e in predicted_components]
+
+        #     response = client.beta.chat.completions.parse(
+        #         model=agent.model,
+        #         messages=[
+
+        #             # {"role": "system","content": f"You are an helpful assistant for the {task} of a {product}. In the uploaded image you can find the components of the product to be assembled and their precedence relationships. Please give as output a valid sequence of the components to be assembled in order (in the form: 1 -> 2 -> 5 and so on) as a Python list satisfying the dependencies. If a sequence cannot be found, return a False bool variable"},
+        #             {"role": "system","content": f"You are an helpful feedback agent with the goal to correct and improve the output of the reasoning and planning agent for the {task.name} of a {product.name} in {task.domain} industry domain for collaborative robotics."},
+        #             # {"role": "user", "content": f"In the first uploaded image you can find the components of the finished product."},
+        #             # {"role": "user", "content": f"The task understanding agent perceived and extracted {product.name} components information, saved in {product.info}."},
+        #             {"role": "user", "content": f"In the first uploaded image you can find the components of the product and their precedence relationships."},
+        #             {"role": "user", "content": f"The second and third uploaded images depict the current product status during the {task.name} process from different angles to help you better understand the scene."},
+        #             {"role": "user", "content": f"The incorrect answer of the reasoning and planning agent relies on the incompatibility between the predicted components in the current {task.name} status ({predicted_components}) and the brought components until that moment ({brought_objec})."},
+        #             {"role": "user", "content": f"Taking into account the last incorrect prediction of the components {diff_elements} and based on the perception made in the first step by the task understanding agent, predict the {product.name} components present in the current {task.name} status and the next component to be processed."},
+        #             {
+        #             "role": "user",
+        #             "content": [
+        #                 {
+        #                 "type": "image_url",
+        #                 "image_url": {
+        #                     "url": f"data:image/jpeg;base64,{base64_image_component_list}",
+        #                     "detail": "high"
+        #                 },
+        #                 },
+        #                 {
+        #                 "type": "image_url",
+        #                 "image_url": {
+        #                     "url": f"data:image/png;base64,{base64_image_current_step1}",
+        #                     "detail": "high"
+        #                 },
+        #                 },
+        #                 {
+        #                 "type": "image_url",
+        #                 "image_url": {
+        #                     "url": f"data:image/png;base64,{base64_image_current_step2}",
+        #                     "detail": "high"
+        #                 },
+        #                 },
+                        
+
+        #             ],
+        #             },
+        #             ],
+        #         response_format=TaskFormat,
+        #         max_tokens=1000,
+        #         top_p=0,
+        #         temperature=0,
+        #         seed=123
+        #         )
+        #     task.set_task_status(response.choices[0].message.parsed)
+
+        #     print(task)
+        #     print(f"Brought components: {brought_objec}")
+
+        #     predicted_components = task.current_status.brought_components
+            
+        
+        component = task.current_status.next_component
         assert component > 0 and component <= num_components
+        assert component in full_set
 
         # response2 = client.beta.chat.completions.parse(
         
@@ -387,8 +466,9 @@ def main():
         # msg         = data.decode('ascii')
         # component=int(msg)
         brought_objec.append(component)
+        print(f"[INFO] Brought components: {brought_objec}")
         t_fin_proc  = time.time()
-        print(t_fin_proc-t_start_proc)
+        print('t = ',t_fin_proc-t_start_proc)
         
         # if msg=="END":
         #     print("END")

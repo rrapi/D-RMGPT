@@ -61,7 +61,7 @@ class RobotController():
         self.rtde_r.disconnect()
         self.rtde_io.disconnect()
 
-    def send_pose(self, pose:Pose, epsilon=0.001, verbose=True):
+    def send_pose(self, pose:Pose, epsilon=0.001, verbose=False):
         if self.rtde_c.isConnected():
             self.rtde_c.moveL(pose)
             while not targetPoseReached(Pose(*self.get_tcp_pose()), Pose(*pose), epsilon):
@@ -74,7 +74,7 @@ class RobotController():
 
 
 
-    def send_joints(self, joint_angles, verbose=True):
+    def send_joints(self, joint_angles, verbose=False):
         if self.rtde_c.isConnected():
             self.rtde_c.moveJ(joint_angles)
             while not self.rtde_c.isSteady():
@@ -92,7 +92,7 @@ class RobotController():
             return self.rtde_r.getActualQ()
         return None
 
-    def open_gripper(self, verbose=True):
+    def open_gripper(self, verbose=False):
         if not self.rtde_r.getDigitalOutState(self.openGripperDO):
             self.rtde_io.setStandardDigitalOut(self.openGripperDO, True)
             time.sleep(0.01)
@@ -101,7 +101,7 @@ class RobotController():
             if verbose:
                 print("Gripper opened.")
 
-    def close_gripper(self, verbose=True):
+    def close_gripper(self, verbose=False):
         if not self.rtde_r.getDigitalOutState(self.closeGripperDO):
             self.rtde_io.setStandardDigitalOut(self.closeGripperDO, True)
             time.sleep(0.01)
